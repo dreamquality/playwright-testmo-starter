@@ -88,6 +88,20 @@ The workflow runs tests and then submits JUnit results from:
 
 - `test-results/junit-report.xml`
 
+## Playwright + Testmo setup to see test results
+
+1. Configure Testmo repository secrets in GitHub:
+   - `TESTMO_URL`
+   - `TESTMO_TOKEN`
+   - `TESTMO_PROJECT_ID`
+2. Make sure automated test titles use the required Testmo case prefix format: `[C<number>]` (for example: `[C123] Login works`) so CI can map and submit results.
+3. Run CI from a pull request or push (workflow: `.github/workflows/playwright.yml`).
+4. View results in both places:
+   - **GitHub Pages Playwright report**: `https://<owner>.github.io/<repo>/` (for this repository: `https://dreamquality.github.io/playwright-testmo-starter/`)
+   - **Testmo run results**: in your Testmo project after the `Submit results to Testmo` workflow step runs.
+
+> CI always uploads/deploys the Playwright HTML report. Testmo submission runs only when Testmo secrets are configured and case mapping validation passes.
+
 ## How to write a new test with Page Factory + Fixture
 
 1. Import the custom test fixture:
