@@ -1,6 +1,6 @@
 import { test } from '../src/fixtures/test.fixture';
 
-test('[T123] Successful login', async ({ page, pageFactory }) => {
+test('[C123] Successful login', async ({ page, pageFactory }) => {
   await page.setContent(`
     <form id="login-form">
       <label for="username">Username</label>
