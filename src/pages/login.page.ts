@@ -9,9 +9,12 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.usernameInput = page.locator('[name="username"]');
-    this.passwordInput = page.locator('[name="password"]');
-    this.submitButton = page.locator('[type="submit"]');
+    const loginForm = page.locator('form').filter({
+      has: page.locator('[name="username"]'),
+    });
+    this.usernameInput = loginForm.locator('[name="username"]');
+    this.passwordInput = loginForm.locator('[name="password"]');
+    this.submitButton = loginForm.locator('[type="submit"]');
     this.welcomeMessage = page.locator('[data-testid="welcome-message"]');
   }
 
