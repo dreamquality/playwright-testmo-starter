@@ -1,0 +1,42 @@
+{
+  "name": "starter-playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf allure-results && rimraf allure-report && rimraf test-results && rimraf playwright-report && rimraf junit-results",
+    "play-report": "npx playwright show-report",
+    "allure-report": "allure generate ./allure-results --clean",
+    "open-report": "npm run allure-report && allure open ./allure-report",
+    "firefox": "npm run clean && npx playwright test --project=firefox",
+    "chromium": "npx playwright test --project=chromium",
+    "webkit": "npx playwright test --project=webkit",
+    "test": "npm run clean && npx playwright test --project=chromium",
+    "test-head": "npm run clean && npx playwright test --headed",
+    "reinstall": "npx playwright install",
+    "install-deps": "npx playwright install-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dreamquality/starter-ts-playwright.git"
+  },
+  "keywords": [
+    "playwright",
+    "playwright-test",
+    "allure report",
+    "web test automation"
+  ],
+  "author": "DreamReal",
+  "license": "CC0",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.2",
+    "allure-commandline": "^2.40.0",
+    "allure-playwright": "^3.7.2",
+    "playwright": "^1.59.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "rimraf": "^6.1.3"
+  }
+}
