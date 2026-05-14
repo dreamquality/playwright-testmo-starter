@@ -1,1 +1,1 @@
-export { BasePage } from './base-page';
+export { BasePage } from '../../pages/base-page';
