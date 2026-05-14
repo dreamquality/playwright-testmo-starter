@@ -23,7 +23,7 @@ Production-ready Playwright boilerplate using **TypeScript**, **Page Object Mode
 
 ### Architecture overview
 
-- `BasePage`: shared page behavior for all Page Objects.
+- `BasePage`: common base/marker type for all Page Objects and an extension point for shared behavior.
 - `LoginPage`: example Page Object for login interactions/assertions.
 - `PageFactory`: central access point for Page Objects.
 - `test.fixture.ts`: extends Playwright `test` and injects `pageFactory` into every test.
