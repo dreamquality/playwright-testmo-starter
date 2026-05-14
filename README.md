@@ -1,67 +1,105 @@
-<h1 dir="auto"><a class="anchor" aria-hidden="true" href="https://playwright.dev/"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd"></path></svg></a><g-emoji class="g-emoji" alias="performing_arts" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f3ad.png">🎭</g-emoji> Playwright</h1>
+# Playwright + TypeScript + Testmo Boilerplate
 
-# Boilerplate project for Web Test Automation - Playwright
+Production-ready Playwright boilerplate using **TypeScript**, **Page Object Model (POM)**, **Page Factory**, and **custom fixtures** with **Testmo** result submission support.
 
-### General requirements
+## Project structure
 
-- Install a git client such as [git bash](https://git-scm.com/downloads)
+```text
+.
+├── .github/workflows/playwright.yml
+├── src
+│   ├── factory
+│   │   └── page.factory.ts
+│   ├── fixtures
+│   │   └── test.fixture.ts
+│   └── pages
+│       ├── base.page.ts
+│       └── login.page.ts
+├── tests
+│   └── login.spec.ts
+├── playwright.config.ts
+└── package.json
+```
 
-Download and install
+### Architecture overview
 
-- Latest version of [Node.js](https://nodejs.org/es/download/)
-- Java Development Kit [(JDK)](https://www.oracle.com/java/technologies/downloads/)
-  - Make sure you have the environment variable **JAVA_HOME** set to the path of the respective JDK. **(Required for Allure report generation)**.
+- `BasePage`: shared page behavior for all Page Objects.
+- `LoginPage`: example Page Object for login interactions/assertions.
+- `PageFactory`: central access point for Page Objects.
+- `test.fixture.ts`: extends Playwright `test` and injects `pageFactory` into every test.
 
-### Installation of the testing framework
+## Prerequisites
 
-#### **Clone the repository:**
+- Node.js 20+
+- npm 10+
 
-    git clone https://github.com/dreamquality/starter-ts-playwright.git
+## Setup
 
-#### **Install dependencies.**
+Install dependencies:
 
-    npm install
+```bash
+npm install
+```
 
-#### **To run the tests go to the root of the project and run (headless mode)**
+Install Playwright browsers:
 
-    npm run test
+```bash
+npx playwright install --with-deps
+```
 
-#### **To run the tests go to the root of the project and run (headed mode)**
+`@testmo/testmo-cli` is already included in `devDependencies`.
 
-    npm run test-head
+## Running tests locally
 
-#### **To run the tests only on Firefox**
+Run all tests:
 
-    npm run firefox
+```bash
+npm run test
+```
 
-#### **To run the tests only on Chromium**
+Run headed mode:
 
-    npm run chromium
+```bash
+npm run test:headed
+```
 
-#### **To run the tests only on Webkit**
+Open HTML report:
 
-    npm run webkit
+```bash
+npm run test:report
+```
 
+## CI/CD and Testmo environment variables
 
-#### **To open Playwright's unified Html report of test results**
+The GitHub Actions workflow is in:
 
-    npm run play-report
+- `.github/workflows/playwright.yml`
 
-#### **To create and open the Allure unified report of test results**
+Configure these repository secrets:
 
-    npm run open-report
+- `TESTMO_URL` (for example: `https://your-company.testmo.net`)
+- `TESTMO_TOKEN`
+- `TESTMO_PROJECT_ID`
 
-#### **IMPORTANT**
+The workflow runs tests and then submits JUnit results from:
 
-After each upgrade of **Playwright**, the project must be restarted locally with the command:
+- `test-results/junit-report.xml`
 
-    npm run reinstall
+## How to write a new test with Page Factory + Fixture
 
-To download the latest versions of the Browsers..
+1. Import the custom test fixture:
 
+```ts
+import { test, expect } from '../src/fixtures/test.fixture';
+```
 
-#### **Article with explanations**
+2. Use `pageFactory` from test context.
+3. Prefix test title with Testmo case ID, for example:
 
-<a href="https://habr.com/ru/post/712084/" alt="404">Page Object, Page Factory</a>
+```ts
+test('[T123] Successful login', async ({ pageFactory }) => {
+  await pageFactory.loginPage.login('standard_user', 'secret_sauce');
+});
+```
 
-
+4. Keep Page Object logic inside `src/pages/*` and instantiate through `PageFactory` only.
