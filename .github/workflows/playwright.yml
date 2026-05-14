@@ -74,6 +74,7 @@ jobs:
           const testcaseNameRegex = /<testcase\b[^>]*\bname="([^"]+)"/g;
           const testmoCaseIdPrefixRegex = /^\[C\d+\]/;
           const unmapped = [];
+          let mappedCount = 0;
           let testcaseCount = 0;
 
           for (const file of xmlFiles) {
@@ -82,7 +83,9 @@ jobs:
             while ((match = testcaseNameRegex.exec(content)) !== null) {
               testcaseCount += 1;
               const testName = match[1];
-              if (!testmoCaseIdPrefixRegex.test(testName)) {
+              if (testmoCaseIdPrefixRegex.test(testName)) {
+                mappedCount += 1;
+              } else {
                 unmapped.push(`${file}: ${testName}`);
               }
             }
@@ -99,19 +102,23 @@ jobs:
             process.exit(0);
           }
 
+          if (mappedCount === 0) {
+            console.log('No mapped testcases found with a Testmo case ID prefix. Skipping Testmo submission.');
+            fs.appendFileSync(githubOutput, 'ready=false\n');
+            process.exit(0);
+          }
+
           if (unmapped.length > 0) {
-            console.log('Found testcases without a Testmo case ID prefix. Skipping Testmo submission.');
+            console.log(`Found ${unmapped.length} testcase(s) without a Testmo case ID prefix. Continuing with mapped testcase submission readiness.`);
             for (const entry of unmapped.slice(0, 20)) {
               console.log(`- ${entry}`);
             }
             if (unmapped.length > 20) {
               console.log(`- ... and ${unmapped.length - 20} more`);
             }
-            fs.appendFileSync(githubOutput, 'ready=false\n');
-            process.exit(0);
           }
 
-          console.log(`Validated ${testcaseCount} JUnit testcase(s); all include a Testmo case ID prefix.`);
+          console.log(`Validated ${testcaseCount} JUnit testcase(s); found ${mappedCount} mapped testcase(s) with a Testmo case ID prefix.`);
           fs.appendFileSync(githubOutput, 'ready=true\n');
           NODE
 
