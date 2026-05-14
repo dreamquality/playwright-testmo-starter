@@ -8,7 +8,7 @@
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
     "testmo:submit": "testmo automation:run:submit --instance \"$TESTMO_URL\" --project-id \"$TESTMO_PROJECT_ID\" --name \"Playwright Automated Run\" --source \"github-actions\" --results \"test-results/junit-report.xml\"",
-    "test:ci": "npm run test && npm run testmo:submit"
+    "test:ci": "sh -c 'npm run test; status=$?; npm run testmo:submit; exit $status'"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
