@@ -11,12 +11,9 @@ Production-ready Playwright boilerplate using **TypeScript**, **Page Object Mode
 │       └── playwright.yml
 ├── docs/
 ├── src/
-│   ├── components/
+│   ├── factory/
 │   ├── fixtures/
-│   ├── page-factory/
-│   ├── pages/
-│   ├── types/
-│   └── utils/
+│   └── pages/
 ├── tests/
 │   ├── login.spec.ts
 │   └── ...
