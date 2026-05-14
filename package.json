@@ -8,7 +8,7 @@
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
     "testmo:submit": "testmo automation:run:submit --instance \"$TESTMO_URL\" --project-id \"$TESTMO_PROJECT_ID\" --name \"Playwright Automated Run\" --source \"github-actions\" --results \"test-results/junit-report.xml\"",
-    "test:ci": "sh -c 'npm run test; test_status=$?; npm run testmo:submit; submit_status=$?; if [ $test_status -ne 0 ]; then exit $test_status; fi; exit $submit_status'"
+    "test:ci": "sh -c 'npm run test; test_status=$?; if [ -n \"$TESTMO_URL\" ] && [ -n \"$TESTMO_PROJECT_ID\" ]; then npm run testmo:submit; submit_status=$?; else echo \"Skipping Testmo submission: TESTMO_URL and TESTMO_PROJECT_ID must be set.\"; submit_status=0; fi; if [ $test_status -ne 0 ]; then exit $test_status; fi; exit $submit_status'"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
