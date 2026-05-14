@@ -1,42 +1,19 @@
 {
-  "name": "starter-playwright",
+  "name": "playwright-testmo-starter",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Production-ready Playwright + TypeScript boilerplate with POM, Page Factory, fixtures, and Testmo integration.",
   "scripts": {
-    "clean": "rimraf allure-results && rimraf allure-report && rimraf test-results && rimraf playwright-report && rimraf junit-results",
-    "play-report": "npx playwright show-report",
-    "allure-report": "allure generate ./allure-results --clean",
-    "open-report": "npm run allure-report && allure open ./allure-report",
-    "firefox": "npm run clean && npx playwright test --project=firefox",
-    "chromium": "npx playwright test --project=chromium",
-    "webkit": "npx playwright test --project=webkit",
-    "test": "npm run clean && npx playwright test --project=chromium",
-    "test-head": "npm run clean && npx playwright test --headed",
-    "reinstall": "npx playwright install",
-    "install-deps": "npx playwright install-deps"
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "testmo:submit": "testmo automation:run:submit --instance \"$TESTMO_URL\" --project-id \"$TESTMO_PROJECT_ID\" --name \"Playwright Automated Run\" --source \"github-actions\" --results \"test-results/junit-report.xml\"",
+    "test:ci": "sh -c 'npm run test; test_status=$?; if [ -n \"$TESTMO_URL\" ] && [ -n \"$TESTMO_PROJECT_ID\" ]; then npm run testmo:submit; submit_status=$?; else echo \"Skipping Testmo submission: TESTMO_URL and TESTMO_PROJECT_ID must be set.\"; submit_status=0; fi; if [ $test_status -ne 0 ]; then exit $test_status; fi; exit $submit_status'"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dreamquality/starter-ts-playwright.git"
-  },
-  "keywords": [
-    "playwright",
-    "playwright-test",
-    "allure report",
-    "web test automation"
-  ],
-  "author": "DreamReal",
-  "license": "CC0",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@testmo/testmo-cli": "^1.4.9",
     "@types/node": "^25.6.2",
-    "allure-commandline": "^2.40.0",
-    "allure-playwright": "^3.7.2",
-    "playwright": "^1.59.1"
-  },
-  "dependencies": {
-    "dotenv": "^17.4.2",
-    "rimraf": "^6.1.3"
+    "typescript": "^6.0.3"
   }
 }
