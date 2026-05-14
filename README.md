@@ -6,17 +6,20 @@ Production-ready Playwright boilerplate using **TypeScript**, **Page Object Mode
 
 ```text
 .
-├── .github/workflows/playwright.yml
-├── src
-│   ├── factory
-│   │   └── page.factory.ts
-│   ├── fixtures
-│   │   └── test.fixture.ts
-│   └── pages
-│       ├── base.page.ts
-│       └── login.page.ts
-├── tests
-│   └── login.spec.ts
+├── .github/
+│   └── workflows/
+│       └── playwright.yml
+├── docs/
+├── src/
+│   ├── components/
+│   ├── fixtures/
+│   ├── page-factory/
+│   ├── pages/
+│   ├── types/
+│   └── utils/
+├── tests/
+│   ├── login.spec.ts
+│   └── ...
 ├── playwright.config.ts
 └── package.json
 ```
