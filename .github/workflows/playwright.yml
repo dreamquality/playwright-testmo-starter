@@ -37,8 +37,86 @@ jobs:
       - name: Run tests
         run: npm run test
 
+      - name: Validate Testmo case mapping
+        if: always()
+        id: validate_testmo_mapping
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const searchRoots = ['test-results', 'playwright-report', '.'];
+          const xmlFiles = [];
+          const seen = new Set();
+
+          function walk(dir) {
+            if (!fs.existsSync(dir)) {
+              return;
+            }
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const fullPath = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                walk(fullPath);
+              } else if (entry.isFile() && fullPath.endsWith('.xml')) {
+                const normalized = path.normalize(fullPath);
+                if (!seen.has(normalized)) {
+                  seen.add(normalized);
+                  xmlFiles.push(normalized);
+                }
+              }
+            }
+          }
+
+          for (const root of searchRoots) {
+            walk(root);
+          }
+
+          const testcaseNameRegex = /<testcase\b[^>]*\bname="([^"]+)"/g;
+          const testmoCaseIdPrefixRegex = /^\[C\d+\]/;
+          const unmapped = [];
+          let testcaseCount = 0;
+
+          for (const file of xmlFiles) {
+            const content = fs.readFileSync(file, 'utf8');
+            let match;
+            while ((match = testcaseNameRegex.exec(content)) !== null) {
+              testcaseCount += 1;
+              const testName = match[1];
+              if (!testmoCaseIdPrefixRegex.test(testName)) {
+                unmapped.push(`${file}: ${testName}`);
+              }
+            }
+          }
+
+          const githubOutput = process.env.GITHUB_OUTPUT;
+          if (!githubOutput) {
+            throw new Error('GITHUB_OUTPUT is not set');
+          }
+
+          if (xmlFiles.length === 0 || testcaseCount === 0) {
+            console.log('No JUnit XML testcases found; skipping Testmo submission to avoid uploading unmapped results.');
+            fs.appendFileSync(githubOutput, 'ready=false\n');
+            process.exit(0);
+          }
+
+          if (unmapped.length > 0) {
+            console.log('Found testcases without a Testmo case ID prefix. Skipping Testmo submission.');
+            for (const entry of unmapped.slice(0, 20)) {
+              console.log(`- ${entry}`);
+            }
+            if (unmapped.length > 20) {
+              console.log(`- ... and ${unmapped.length - 20} more`);
+            }
+            fs.appendFileSync(githubOutput, 'ready=false\n');
+            process.exit(0);
+          }
+
+          console.log(`Validated ${testcaseCount} JUnit testcase(s); all include a Testmo case ID prefix.`);
+          fs.appendFileSync(githubOutput, 'ready=true\n');
+          NODE
+
       - name: Submit results to Testmo
-        if: always() && env.TESTMO_URL != '' && env.TESTMO_TOKEN != '' && env.TESTMO_PROJECT_ID != ''
+        if: always() && env.TESTMO_URL != '' && env.TESTMO_TOKEN != '' && env.TESTMO_PROJECT_ID != '' && steps.validate_testmo_mapping.outputs.ready == 'true'
         run: npm run testmo:submit
 
       - name: Upload test artifacts
