@@ -106,3 +106,5 @@ test('[T123] Successful login', async ({ pageFactory }) => {
 ```
 
 4. Keep Page Object logic inside `src/pages/*` and instantiate through `PageFactory` only.
+
+> Note: `tests/test-search.spec.ts` still uses the legacy `searchTest` fixture from `tests/tests.ts` (which relies on `fixtures/*` + `pages/*`). Use the `src/fixtures/test.fixture.ts` + `PageFactory` pattern for new tests, and migrate legacy specs incrementally.
