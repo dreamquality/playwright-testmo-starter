@@ -1,1 +1,1 @@
-export { BasePage } from '../../pages/base-page';
+export class BasePage {}
