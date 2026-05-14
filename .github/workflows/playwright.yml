@@ -118,12 +118,26 @@ jobs:
           fs.appendFileSync(githubOutput, 'ready=true\n');
           NODE
 
-      - name: Submit results to Testmo
+      - name: Check Testmo credentials availability
+        if: always()
+        id: testmo_credentials
         env:
           TESTMO_URL: ${{ secrets.TESTMO_URL }}
           TESTMO_TOKEN: ${{ secrets.TESTMO_TOKEN }}
           TESTMO_PROJECT_ID: ${{ secrets.TESTMO_PROJECT_ID }}
-        if: always() && env.TESTMO_URL != '' && env.TESTMO_TOKEN != '' && env.TESTMO_PROJECT_ID != '' && steps.validate_testmo_mapping.outputs.ready == 'true'
+        run: |
+          if [ -n "$TESTMO_URL" ] && [ -n "$TESTMO_TOKEN" ] && [ -n "$TESTMO_PROJECT_ID" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Submit results to Testmo
+        if: always() && steps.testmo_credentials.outputs.available == 'true' && steps.validate_testmo_mapping.outputs.ready == 'true'
+        env:
+          TESTMO_URL: ${{ secrets.TESTMO_URL }}
+          TESTMO_TOKEN: ${{ secrets.TESTMO_TOKEN }}
+          TESTMO_PROJECT_ID: ${{ secrets.TESTMO_PROJECT_ID }}
         run: npm run testmo:submit
 
       - name: Upload test artifacts
@@ -147,11 +161,12 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: playwright-artifacts
+          path: artifacts
 
       - name: Deploy test results to GitHub Pages
-        if: hashFiles('playwright-report/index.html') != ''
+        if: hashFiles('artifacts/playwright-report/index.html') != ''
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: playwright-report
+          publish_dir: artifacts/playwright-report
