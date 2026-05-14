@@ -111,7 +111,8 @@ import { test, expect } from '../src/fixtures/test.fixture';
 3. Prefix test title with Testmo case ID, for example:
 
 ```ts
-test('[C123] Successful login', async ({ pageFactory }) => {
+test('[C123] Successful login', async ({ page, pageFactory }) => {
+  await page.goto('https://www.saucedemo.com/');
   await pageFactory.loginPage.login('standard_user', 'secret_sauce');
 });
 ```
